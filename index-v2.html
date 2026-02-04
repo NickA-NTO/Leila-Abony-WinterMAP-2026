@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Deep Dive: Leila Abony</title>
+    <style>
+        :root {
+            --danger: #e53e3e;
+            --warning: #d69e2e;
+            --success: #38a169;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --bg: #f7fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--bg);
+            padding: 2rem;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header {
+            background: #1e3a5f;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 { font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .header p { opacity: 0.8; font-size: 0.9rem; }
+        .section {
+            background: white;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-top: none;
+        }
+        .section:last-of-type { border-radius: 0 0 8px 8px; }
+        .section-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .metric {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        .metric-value { font-size: 1.5rem; font-weight: 700; }
+        .metric-label { font-size: 0.75rem; color: var(--text-light); }
+        .metric.bad .metric-value { color: var(--danger); }
+        .metric.warn .metric-value { color: var(--warning); }
+        .metric.good .metric-value { color: var(--success); }
+        .root-cause {
+            background: #fff5f5;
+            border-left: 4px solid var(--danger);
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+        }
+        .root-cause strong { color: var(--danger); }
+        .root-cause ul { margin-left: 1.25rem; margin-top: 0.5rem; }
+        .root-cause li { margin-bottom: 0.5rem; }
+        .fix-list { list-style: none; }
+        .fix-list li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg);
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+        }
+        .fix-list li:nth-child(2) { border-left-color: var(--warning); }
+        .fix-list li:nth-child(3) { border-left-color: var(--warning); }
+        .fix-list li:nth-child(4) { border-left-color: var(--warning); }
+        .fix-list .fix-title { font-weight: 600; }
+        .fix-list .fix-detail { font-size: 0.85rem; color: var(--text-light); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: 0.75rem; }
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge-danger { background: #fed7d7; color: #c53030; }
+        .badge-success { background: #c6f6d5; color: #276749; }
+        .badge-warning { background: #fefcbf; color: #975a16; }
+        .data-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .data-table h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text-light); }
+        @media (max-width: 600px) {
+            .metrics { grid-template-columns: repeat(2, 1fr); }
+            .data-tables { grid-template-columns: 1fr; }
+        }
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        .app-performance { margin-top: 1.5rem; }
+        .app-performance h4 { font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--text-light); }
+        .app-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+        .app-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+        }
+        .app-bars { display: flex; flex-direction: column; gap: 0.4rem; }
+        .bar-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 50px;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .bar-label { font-size: 0.7rem; color: var(--text-light); }
+        .bar-track {
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .bar-fill { height: 100%; border-radius: 6px; }
+        .bar-fill.good { background: var(--success); }
+        .bar-fill.warn { background: var(--warning); }
+        .bar-fill.bad { background: var(--danger); }
+        .bar-value { font-size: 0.7rem; color: var(--text-light); text-align: right; }
+        .highlight-box {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+        }
+        .highlight-box strong { color: #2b6cb0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Reading Deep Dive: Leila Abony</h1>
+            <p>Grade 1 | Alpha School | Winter MAP 2025-26</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Root Cause Analysis</div>
+            <div class="metrics">
+                <div class="metric bad">
+                    <div class="metric-value">-2</div>
+                    <div class="metric-label">Fall-to-Winter RIT Change</div>
+                </div>
+                <div class="metric bad">
+                    <div class="metric-value">51%</div>
+                    <div class="metric-label">ClearFluency Idle Time</div>
+                </div>
+                <div class="metric good">
+                    <div class="metric-value">2</div>
+                    <div class="metric-label">Effective Grades Mastered</div>
+                </div>
+                <div class="metric warn">
+                    <div class="metric-value">79%</div>
+                    <div class="metric-label">Quiz Accuracy</div>
+                </div>
+            </div>
+
+            <div class="root-cause">
+                <strong>Root Causes Identified:</strong>
+                <ul>
+                    <li><strong>ANTON Skill-Shopping (Oct 13-22):</strong> Student spent ~2 hours on Kindergarten letter recognition content (Aa, Bb, Cc through Uu) when working at Grade 1 level. This was mastered content 1-2 grades below her level, wasting 147+ minutes on skill-shopping.</li>
+                    <li><strong>ClearFluency Idle Time (51%):</strong> Only 49% of ClearFluency time spent on productive activities (Steps 1-3). 51% logged as "Other" time - student not actively reading or completing comprehension tasks. Multiple days with 60-130+ minutes of "Other" time.</li>
+                    <li><strong>MAP Domain Decline:</strong> Language & Writing dropped 11 RIT points (175 → 164). Literature & Informational Text dropped 7 points (185 → 178). Both areas flagged as "Suggested Area of Focus" in Winter MAP.</li>
+                    <li><strong>ORF Fluency Stagnation:</strong> Level M WCPM declined from 64 (Jan 7) → 54 (Jan 29). G2 benchmark requires 104 WCPM @ 95% accuracy - student at 54 WCPM is well below threshold despite passing accuracy.</li>
+                </ul>
+            </div>
+
+            <div class="highlight-box">
+                <strong>Positive Note:</strong> Student mastered 2 effective grade levels this year and is now enrolled in ClearFluency Grade 2 Hole-Filling. Lalilo progress shows advancement from Long A "ai" (G1) to Sight Word "less" (G2). Overall comprehension score is 79% (248/313).
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Remediation Plan</div>
+            <ol class="fix-list">
+                <li>
+                    <div class="fix-title">1. Address ClearFluency Idle Time Immediately</div>
+                    <div class="fix-detail">51% idle time is critical. Implement monitoring to ensure student is actively engaged during ClearFluency sessions. Consider shorter, more focused sessions with adult supervision. Target: reduce "Other" time to &lt;20%.</div>
+                </li>
+                <li>
+                    <div class="fix-title">2. Remove or Restrict ANTON Access</div>
+                    <div class="fix-detail">ANTON was already phased out (last activity Dec 12), but ensure it remains off roster. Student skill-shopped on K-level content when she needed G1 ELA practice. If re-rostered, restrict to Grade 1 ELA only with no navigation to other content.</div>
+                </li>
+                <li>
+                    <div class="fix-title">3. Focus on Language & Writing Domain</div>
+                    <div class="fix-detail">Winter MAP shows Language & Writing at 164 RIT (-11 from Fall). MAP indicates skills to develop at 161-170 range: contractions, spelling patterns, subject-verb agreement, sentence completeness. Ensure Lalilo Grade 2 content addresses these foundational grammar skills.</div>
+                </li>
+                <li>
+                    <div class="fix-title">4. Build Fluency for G2 ORF Benchmark</div>
+                    <div class="fix-detail">Current Level M: 54 WCPM vs target 104 WCPM. Student needs +50 WCPM to pass G2 benchmark. Continue ClearFluency G2 Hole-Filling with emphasis on repeated reading practice. Monitor WCPM weekly.</div>
+                </li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Supporting Data</div>
+
+            <div class="data-tables">
+                <div class="data-table">
+                    <h4>RIT Score Trajectory</h4>
+                    <table>
+                        <tr>
+                            <th>Period</th>
+                            <th>RIT</th>
+                            <th>Change</th>
+                        </tr>
+                        <tr>
+                            <td>Fall 2025-26</td>
+                            <td>186</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Winter 2025-26</td>
+                            <td>184</td>
+                            <td><span class="badge badge-danger">-2 RIT</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="data-table">
+                    <h4>MAP Domain Scores (Winter)</h4>
+                    <table>
+                        <tr>
+                            <th>Domain</th>
+                            <th>RIT</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>Language & Writing</td>
+                            <td>164</td>
+                            <td><span class="badge badge-danger">-11 RIT</span></td>
+                        </tr>
+                        <tr>
+                            <td>Lit & Informational</td>
+                            <td>178</td>
+                            <td><span class="badge badge-danger">-7 RIT</span></td>
+                        </tr>
+                        <tr>
+                            <td>Foundational Skills</td>
+                            <td>191</td>
+                            <td><span class="badge badge-warning">-3 RIT</span></td>
+                        </tr>
+                        <tr>
+                            <td>Vocabulary</td>
+                            <td>198</td>
+                            <td><span class="badge badge-success">+9 RIT</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>ORF Placement Check (Graded Assessments)</h4>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Text Level</th>
+                        <th>WCPM</th>
+                        <th>Accuracy</th>
+                        <th>Comp</th>
+                        <th>Benchmark</th>
+                    </tr>
+                    <tr>
+                        <td>Jan 29, 2026</td>
+                        <td>Level M (G2)</td>
+                        <td>54</td>
+                        <td>100%</td>
+                        <td>3/5</td>
+                        <td><span class="badge badge-danger">NOT PASS (need 104)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Jan 7, 2026</td>
+                        <td>Level M (G2)</td>
+                        <td>64</td>
+                        <td>96.8%</td>
+                        <td>4/5</td>
+                        <td><span class="badge badge-danger">NOT PASS (need 104)</span></td>
+                    </tr>
+                    <tr>
+                        <td>Dec 5, 2025</td>
+                        <td>Level J (G1)</td>
+                        <td>81</td>
+                        <td>94.2%</td>
+                        <td>5/5</td>
+                        <td><span class="badge badge-success">PASS (need 67)</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>App Usage Timeline</h4>
+                <table>
+                    <tr>
+                        <th>App</th>
+                        <th>Period</th>
+                        <th>Days</th>
+                        <th>XP</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>Lalilo (Language)</td>
+                        <td>Aug 18 - Feb 3</td>
+                        <td>65</td>
+                        <td>1,489</td>
+                        <td>84-100% accuracy, consistent</td>
+                    </tr>
+                    <tr>
+                        <td>Amplify</td>
+                        <td>Sep 9 - Dec 10</td>
+                        <td>35</td>
+                        <td>966</td>
+                        <td>54-98% accuracy, phased out</td>
+                    </tr>
+                    <tr>
+                        <td>ANTON (Reading)</td>
+                        <td>Oct 13 - Dec 10</td>
+                        <td>10</td>
+                        <td>525</td>
+                        <td>Skill-shopping issue, phased out</td>
+                    </tr>
+                    <tr>
+                        <td>ClearFluency G1</td>
+                        <td>Dec 1 - Dec 17</td>
+                        <td>8</td>
+                        <td>240</td>
+                        <td>83-100% accuracy</td>
+                    </tr>
+                    <tr>
+                        <td>ClearFluency G2</td>
+                        <td>Jan 7 - Feb 3</td>
+                        <td>14</td>
+                        <td>280</td>
+                        <td>60-100% accuracy, 51% idle</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="app-performance">
+                <h4>App Performance Metrics</h4>
+
+                <div class="app-row">
+                    <div class="app-name">ClearFluency G2</div>
+                    <div class="app-bars">
+                        <div class="bar-row">
+                            <span class="bar-label">Fluency (WCPM)</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bad" style="width: 52%"></div>
+                            </div>
+                            <span class="bar-value">54/104</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill warn" style="width: 80%"></div>
+                            </div>
+                            <span class="bar-value">20</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Active Time/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bad" style="width: 49%"></div>
+                            </div>
+                            <span class="bar-value">49%</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Accuracy</span>
+                            <div class="bar-track">
+                                <div class="bar-fill warn" style="width: 79%"></div>
+                            </div>
+                            <span class="bar-value">79%</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Min</span>
+                            <div class="bar-track">
+                                <div class="bar-fill bad" style="width: 40%"></div>
+                            </div>
+                            <span class="bar-value">0.4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="app-row">
+                    <div class="app-name">Lalilo G1-G2</div>
+                    <div class="app-bars">
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 92%"></div>
+                            </div>
+                            <span class="bar-value">23</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Active Time/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill warn" style="width: 76%"></div>
+                            </div>
+                            <span class="bar-value">19 min</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Accuracy</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 91%"></div>
+                            </div>
+                            <span class="bar-value">91%</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Min</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">1.2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="app-row">
+                    <div class="app-name">Amplify</div>
+                    <div class="app-bars">
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">28</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Active Time/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 92%"></div>
+                            </div>
+                            <span class="bar-value">23 min</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Accuracy</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 85%"></div>
+                            </div>
+                            <span class="bar-value">85%</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Min</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">1.2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>ANTON Skill-Shopping Detail (Oct 13-22, 2025)</h4>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Content</th>
+                        <th>Grade Level</th>
+                        <th>Time</th>
+                        <th>Assessment</th>
+                    </tr>
+                    <tr>
+                        <td>Oct 13</td>
+                        <td>Aa, Bb, Cc (letters)</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>9 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 14</td>
+                        <td>ABC, Dd-Jj (letters)</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>22 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 15</td>
+                        <td>Kk, Ll, Mm, JKL</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>10 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 16</td>
+                        <td>Mm-Pp, MNO</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>12 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 17</td>
+                        <td>Pp-Ss, PQR</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>11 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 20</td>
+                        <td>Ss-Uu, STU</td>
+                        <td><span class="badge badge-danger">Kindergarten</span></td>
+                        <td>11 min</td>
+                        <td>Below grade - skill-shopping</td>
+                    </tr>
+                    <tr>
+                        <td>Oct 21-22</td>
+                        <td>Visualize, Analyze, etc.</td>
+                        <td><span class="badge badge-success">Grade 1</span></td>
+                        <td>59 min</td>
+                        <td>Appropriate content</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>Total K-level skill-shopping:</strong></td>
+                        <td><strong>75 min</strong></td>
+                        <td><span class="badge badge-danger">56% inappropriate</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>ClearFluency Time Breakdown</h4>
+                <table>
+                    <tr>
+                        <th>Activity</th>
+                        <th>% of Time</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Step 1: Preview & Read on My Own</td>
+                        <td>13%</td>
+                        <td><span class="badge badge-success">Productive</span></td>
+                    </tr>
+                    <tr>
+                        <td>Step 2: Read & Record</td>
+                        <td>30%</td>
+                        <td><span class="badge badge-success">Productive</span></td>
+                    </tr>
+                    <tr>
+                        <td>Step 3: Take the Quiz</td>
+                        <td>6%</td>
+                        <td><span class="badge badge-success">Productive</span></td>
+                    </tr>
+                    <tr>
+                        <td>Other (Idle)</td>
+                        <td>51%</td>
+                        <td><span class="badge badge-danger">Wasted Time</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>Comprehension Skills Breakdown (ClearFluency)</h4>
+                <table>
+                    <tr>
+                        <th>Skill</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Make Connections</td>
+                        <td>20/20 (100%)</td>
+                        <td><span class="badge badge-success">Strength</span></td>
+                    </tr>
+                    <tr>
+                        <td>Guiding Thinking</td>
+                        <td>7/7 (100%)</td>
+                        <td><span class="badge badge-success">Strength</span></td>
+                    </tr>
+                    <tr>
+                        <td>Figurative Language</td>
+                        <td>12/13 (92%)</td>
+                        <td><span class="badge badge-success">Strength</span></td>
+                    </tr>
+                    <tr>
+                        <td>Story Elements</td>
+                        <td>54/61 (89%)</td>
+                        <td><span class="badge badge-success">Strength</span></td>
+                    </tr>
+                    <tr>
+                        <td>Compare and Contrast</td>
+                        <td>4/8 (50%)</td>
+                        <td><span class="badge badge-danger">Needs Work</span></td>
+                    </tr>
+                    <tr>
+                        <td>Context Clues</td>
+                        <td>1/2 (50%)</td>
+                        <td><span class="badge badge-danger">Needs Work</span></td>
+                    </tr>
+                    <tr>
+                        <td>Nonfiction Text Features</td>
+                        <td>5/9 (56%)</td>
+                        <td><span class="badge badge-danger">Needs Work</span></td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            Leila Abony | Grade 1 | Alpha School | Winter MAP 2025-26<br>
+            Data: MAP Assessment, Daily Metrics, ClearFluency Reports, ORF Results, ANTON History | Generated: February 2026
+        </div>
+    </div>
+</body>
+</html>
