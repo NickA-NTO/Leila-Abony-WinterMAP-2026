@@ -148,13 +148,7 @@
         .bar-fill.warn { background: var(--warning); }
         .bar-fill.bad { background: var(--danger); }
         .bar-value { font-size: 0.7rem; color: var(--text-light); text-align: right; }
-        .highlight-box {
-            background: #ebf8ff;
-            border-left: 4px solid #3182ce;
-            padding: 0.75rem 1rem;
-            margin-top: 1rem;
-        }
-        .highlight-box strong { color: #2b6cb0; }
+        .app-verdict { font-size: 0.8rem; margin-top: 0.5rem; padding: 0.5rem; background: white; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -168,32 +162,32 @@
             <div class="section-title">Root Cause Analysis</div>
             <div class="metrics">
                 <div class="metric bad">
-                    <div class="metric-value">-2x</div>
-                    <div class="metric-label">Fall-to-Winter RIT Change</div>
-                </div>
-                <div class="metric bad">
-                    <div class="metric-value">56%</div>
-                    <div class="metric-label">ANTON K-Level Time</div>
+                    <div class="metric-value">-0.3x</div>
+                    <div class="metric-label">Fall-to-Winter Growth</div>
                 </div>
                 <div class="metric good">
-                    <div class="metric-value">2</div>
-                    <div class="metric-label">Effective Grades Mastered</div>
+                    <div class="metric-value">26 min</div>
+                    <div class="metric-label">Avg Time/Day</div>
                 </div>
-                <div class="metric warn">
-                    <div class="metric-value">79%</div>
-                    <div class="metric-label">Quiz Accuracy</div>
+                <div class="metric good">
+                    <div class="metric-value">1.0</div>
+                    <div class="metric-label">XP/Minute</div>
+                </div>
+                <div class="metric good">
+                    <div class="metric-value">86%</div>
+                    <div class="metric-label">Avg Accuracy</div>
                 </div>
             </div>
 
             <div class="root-cause">
                 <strong>Root Causes Identified:</strong>
                 <ul>
-                    <li><strong>ANTON Skill-Shopping (Oct 13-22):</strong> Student spent ~2 hours on Kindergarten letter recognition content (Aa, Bb, Cc through Uu) when working at Grade 1 level. This was mastered content 1-2 grades below her level, wasting 147+ minutes on skill-shopping.</li>
-                    <li><strong>MAP Domain Decline:</strong> Language & Writing dropped 11 RIT points (175 → 164). Literature & Informational Text dropped 7 points (185 → 178). Both areas flagged as "Suggested Area of Focus" in Winter MAP.</li>
-                    <li><strong>ORF Fluency Stagnation:</strong> Level M WCPM declined from 64 (Jan 7) → 54 (Jan 29). G2 benchmark requires 104 WCPM @ 95% accuracy - student at 54 WCPM is well below threshold despite passing accuracy.</li>
+                    <li><strong>Lalilo Placement Gap - Grammar Skills Skipped:</strong> Leila started Lalilo at lesson #167 (Long A "ai"), completely skipping Subject/Verb Agreement (#143) and Complete Sentences (#97). MAP flagged Language & Writing as Suggested Area of Focus (175 → 164, -11 RIT). These foundational grammar skills were never taught.</li>
+                    <li><strong>ANTON Skill-Shopping (Oct 13-22):</strong> Student spent ~77 minutes working on Kindergarten letter recognition (Aa through Uu) despite being a Grade 1 student. This was mastered content wasting instructional time on already-known skills.</li>
+                    <li><strong>ClearFluency G2 Placement Challenge:</strong> Student moved to G2 content (Jan 7) before achieving G2 ORF benchmark (104 WCPM). Current Level M: 54 WCPM (Jan 29). XP/Min dropped to 0.5, indicating content may be too challenging.</li>
+                    <li><strong>MobyMax Comprehension Struggles:</strong> Student attempted key details skills (Dec 16-17) with only 40-60% mastery. "Identify key details" at 60% with 20% on-task and 30% efficiency indicates engagement issues with comprehension content.</li>
                 </ul>
             </div>
-
         </div>
 
         <div class="section">
@@ -201,11 +195,15 @@
             <ol class="fix-list">
                 <li>
                     <div class="fix-title">1. Address Lalilo Grammar Gap</div>
-                    <div class="fix-detail">Leila started Lalilo at Long A "ai" (G1 #167) and is now at "less" (G2 #96). Her starting placement SKIPPED Subject/Verb Agreement (G1 #143) - a key skill MAP flagged in Language & Writing. She completed contractions lessons but missed foundational grammar. Consider assigning G1 grammar lessons #97-143 (Complete Sentences through Subject/Verb Agreement) as supplemental work.</div>
+                    <div class="fix-detail">Assign supplemental Lalilo G1 lessons #97-143 (Complete Sentences through Subject/Verb Agreement). These skills align directly with MAP Language & Writing skills flagged for development: agreement, sentence completeness, verb tenses.</div>
                 </li>
                 <li>
-                    <div class="fix-title">2. Build Fluency for G2 ORF Benchmark</div>
-                    <div class="fix-detail">Current Level M: 54 WCPM vs target 104 WCPM. Student needs +50 WCPM to pass G2 benchmark. Continue ClearFluency G2 Hole-Filling with emphasis on repeated reading practice. Monitor WCPM weekly.</div>
+                    <div class="fix-title">2. Continue ClearFluency G2 Hole-Filling with Fluency Focus</div>
+                    <div class="fix-detail">Current Level M: 54 WCPM vs target 104 WCPM. Maintain repeated reading practice in G2 Hole-Filling course. Monitor WCPM weekly - student needs +50 WCPM to pass G2 benchmark.</div>
+                </li>
+                <li>
+                    <div class="fix-title">3. Increase Comprehension Practice via ClearFluency Quizzes</div>
+                    <div class="fix-detail">ClearFluency quiz accuracy at 70% - focus on main idea, supporting details, and inference questions that align with MAP Literature & Informational Text gaps (178 RIT, -7 from Fall).</div>
                 </li>
             </ol>
         </div>
@@ -240,7 +238,7 @@
                         <tr>
                             <th>Domain</th>
                             <th>RIT</th>
-                            <th>Status</th>
+                            <th>Change</th>
                         </tr>
                         <tr>
                             <td>Language & Writing</td>
@@ -267,87 +265,25 @@
             </div>
 
             <div class="data-table" style="margin-top: 1.5rem;">
-                <h4>ORF Placement Check (Graded Assessments)</h4>
+                <h4>ORF Placement Check</h4>
                 <table>
                     <tr>
-                        <th>Date</th>
                         <th>Text Level</th>
                         <th>WCPM</th>
                         <th>Accuracy</th>
-                        <th>Comp</th>
                         <th>Benchmark</th>
                     </tr>
                     <tr>
-                        <td>Jan 29, 2026</td>
-                        <td>Level M (G2)</td>
-                        <td>54</td>
-                        <td>100%</td>
-                        <td>3/5</td>
-                        <td><span class="badge badge-danger">NOT PASS (need 104)</span></td>
-                    </tr>
-                    <tr>
-                        <td>Jan 7, 2026</td>
-                        <td>Level M (G2)</td>
-                        <td>64</td>
-                        <td>96.8%</td>
-                        <td>4/5</td>
-                        <td><span class="badge badge-danger">NOT PASS (need 104)</span></td>
-                    </tr>
-                    <tr>
-                        <td>Dec 5, 2025</td>
                         <td>Level J (G1)</td>
                         <td>81</td>
                         <td>94.2%</td>
-                        <td>5/5</td>
                         <td><span class="badge badge-success">PASS (need 67)</span></td>
                     </tr>
-                </table>
-            </div>
-
-            <div class="data-table" style="margin-top: 1.5rem;">
-                <h4>App Usage Timeline</h4>
-                <table>
                     <tr>
-                        <th>App</th>
-                        <th>Period</th>
-                        <th>Days</th>
-                        <th>XP</th>
-                        <th>Notes</th>
-                    </tr>
-                    <tr>
-                        <td>Lalilo (Language)</td>
-                        <td>Aug 18 - Feb 3</td>
-                        <td>65</td>
-                        <td>1,489</td>
-                        <td>84-100% accuracy, consistent</td>
-                    </tr>
-                    <tr>
-                        <td>Amplify</td>
-                        <td>Sep 9 - Dec 10</td>
-                        <td>35</td>
-                        <td>966</td>
-                        <td>54-98% accuracy, phased out</td>
-                    </tr>
-                    <tr>
-                        <td>ANTON (Reading)</td>
-                        <td>Oct 13 - Dec 10</td>
-                        <td>10</td>
-                        <td>525</td>
-                        <td>Skill-shopping issue, phased out</td>
-                    </tr>
-                    <tr>
-                        <td>ClearFluency G1</td>
-                        <td>Dec 1 - Dec 17</td>
-                        <td>8</td>
-                        <td>240</td>
-                        <td>83-100% accuracy</td>
-                    </tr>
-                    <tr>
-                        <td>ClearFluency G2</td>
-                        <td>Jan 7 - Feb 3</td>
-                        <td>14</td>
-                        <td>280</td>
-                        <td>60-100% accuracy</td>
+                        <td>Level M (G2)</td>
+                        <td>54</td>
+                        <td>100%</td>
+                        <td><span class="badge badge-danger">NOT PASS (need 104)</span></td>
                     </tr>
                 </table>
             </div>
@@ -356,39 +292,70 @@
                 <h4>Curriculum Alignment: MAP vs App Skills</h4>
                 <table>
                     <tr>
-                        <th>MAP Skill Area (161-170 RIT)</th>
+                        <th>MAP Skill Area</th>
                         <th>App Coverage</th>
-                        <th>Assessment</th>
+                        <th>Mastery</th>
+                        <th>Verdict</th>
                     </tr>
                     <tr>
-                        <td>Agreement: Subject-verb, pronoun-antecedent</td>
-                        <td>Lalilo #143 Subject/Verb Agreement - SKIPPED (started at #167)</td>
-                        <td><span class="badge badge-danger">NOT COVERED</span></td>
+                        <td>Subject-Verb Agreement</td>
+                        <td>Lalilo #143 - SKIPPED</td>
+                        <td>N/A</td>
+                        <td><span class="badge badge-danger">GAP</span></td>
                     </tr>
                     <tr>
-                        <td>Contractions: "not", "will", "be", "have", "had"</td>
-                        <td>Lalilo #267-297 contractions lessons completed</td>
+                        <td>Sentence Completeness</td>
+                        <td>Lalilo #97 - SKIPPED</td>
+                        <td>N/A</td>
+                        <td><span class="badge badge-danger">GAP</span></td>
+                    </tr>
+                    <tr>
+                        <td>Contractions</td>
+                        <td>Lalilo G2 covered</td>
+                        <td>90%+</td>
                         <td><span class="badge badge-success">ALIGNED</span></td>
                     </tr>
                     <tr>
-                        <td>Spelling: Patterns, r-controlled, affixes</td>
-                        <td>Lalilo G2 #126-194 prefixes/suffixes covered</td>
+                        <td>Spelling Patterns</td>
+                        <td>Lalilo G1-G2</td>
+                        <td>86%</td>
                         <td><span class="badge badge-success">ALIGNED</span></td>
                     </tr>
                     <tr>
-                        <td>Sentence Completeness: verb tenses, structure</td>
-                        <td>Lalilo #97 Complete Sentences - SKIPPED (started at #167)</td>
-                        <td><span class="badge badge-danger">NOT COVERED</span></td>
-                    </tr>
-                    <tr>
-                        <td>Main Idea, Supporting Details (171-180)</td>
-                        <td>ClearFluency comprehension quizzes - 79% accuracy</td>
+                        <td>Key Details</td>
+                        <td>MobyMax Lit G1</td>
+                        <td>40-60%</td>
                         <td><span class="badge badge-warning">PARTIAL</span></td>
                     </tr>
                     <tr>
-                        <td>Compare/Contrast, Inferences (171-180)</td>
-                        <td>ClearFluency: Compare/Contrast 50%, Context Clues 50%</td>
-                        <td><span class="badge badge-danger">NOT MASTERED</span></td>
+                        <td>Main Idea / Inferences</td>
+                        <td>ClearFluency quizzes</td>
+                        <td>70%</td>
+                        <td><span class="badge badge-warning">PARTIAL</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-table" style="margin-top: 1.5rem;">
+                <h4>MAP-Indicated Placement vs Actual</h4>
+                <table>
+                    <tr>
+                        <th>Indicator</th>
+                        <th>MAP Recommended</th>
+                        <th>Actual Placement</th>
+                        <th>Match?</th>
+                    </tr>
+                    <tr>
+                        <td>Effective Grade</td>
+                        <td>Grade 2</td>
+                        <td>Lalilo G1→G2, CF G1→G2</td>
+                        <td><span class="badge badge-success">✓ Appropriate</span></td>
+                    </tr>
+                    <tr>
+                        <td>ORF Prerequisite (G2)</td>
+                        <td>Pass Level M (104 WCPM)</td>
+                        <td>54 WCPM (not passed)</td>
+                        <td><span class="badge badge-warning">⚠ In progress</span></td>
                     </tr>
                 </table>
             </div>
@@ -402,9 +369,9 @@
                         <div class="bar-row">
                             <span class="bar-label">Fluency (WCPM)</span>
                             <div class="bar-track">
-                                <div class="bar-fill bad" style="width: 52%"></div>
+                                <div class="bar-fill good" style="width: 100%"></div>
                             </div>
-                            <span class="bar-value">54/104</span>
+                            <span class="bar-value">96/69</span>
                         </div>
                         <div class="bar-row">
                             <span class="bar-label">XP/Day</span>
@@ -418,22 +385,65 @@
                             <div class="bar-track">
                                 <div class="bar-fill good" style="width: 100%"></div>
                             </div>
-                            <span class="bar-value">42 min</span>
+                            <span class="bar-value">39 min</span>
                         </div>
                         <div class="bar-row">
                             <span class="bar-label">Accuracy</span>
                             <div class="bar-track">
-                                <div class="bar-fill warn" style="width: 79%"></div>
+                                <div class="bar-fill warn" style="width: 77%"></div>
                             </div>
-                            <span class="bar-value">79%</span>
+                            <span class="bar-value">77%</span>
                         </div>
                         <div class="bar-row">
                             <span class="bar-label">XP/Min</span>
                             <div class="bar-track">
-                                <div class="bar-fill bad" style="width: 40%"></div>
+                                <div class="bar-fill warn" style="width: 50%"></div>
                             </div>
-                            <span class="bar-value">0.4</span>
+                            <span class="bar-value">0.5</span>
                         </div>
+                        <div class="app-verdict"><strong>Verdict: MIXED</strong> - Strong fluency (96 WCPM avg) but XP/Min 0.5 suggests G2 content is challenging. Quiz accuracy 77% indicates comprehension developing.</div>
+                    </div>
+                </div>
+
+                <div class="app-row">
+                    <div class="app-name">ClearFluency G1</div>
+                    <div class="app-bars">
+                        <div class="bar-row">
+                            <span class="bar-label">Fluency (WCPM)</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">107/45</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">30</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Active Time/Day</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 100%"></div>
+                            </div>
+                            <span class="bar-value">38 min</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Accuracy</span>
+                            <div class="bar-track">
+                                <div class="bar-fill good" style="width: 92%"></div>
+                            </div>
+                            <span class="bar-value">92%</span>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">XP/Min</span>
+                            <div class="bar-track">
+                                <div class="bar-fill warn" style="width: 80%"></div>
+                            </div>
+                            <span class="bar-value">0.8</span>
+                        </div>
+                        <div class="app-verdict"><strong>Verdict: EFFECTIVE</strong> - Excellent fluency (107 WCPM avg, well above 45 target). 92% accuracy shows mastery. Appropriately transitioned to G2.</div>
                     </div>
                 </div>
 
@@ -468,6 +478,7 @@
                             </div>
                             <span class="bar-value">1.2</span>
                         </div>
+                        <div class="app-verdict"><strong>Verdict: EFFECTIVE</strong> - Strong 91% accuracy, healthy XP/Min 1.2. However, initial placement skipped foundational grammar lessons that should be backfilled.</div>
                     </div>
                 </div>
 
@@ -502,44 +513,9 @@
                             </div>
                             <span class="bar-value">1.2</span>
                         </div>
+                        <div class="app-verdict"><strong>Verdict: EFFECTIVE</strong> - 85% accuracy, 1.2 XP/Min. Appropriately phased out Dec 10 as student transitioned to ClearFluency.</div>
                     </div>
                 </div>
-            </div>
-
-            <div class="data-table" style="margin-top: 1.5rem;">
-                <h4>App Effectiveness Analysis</h4>
-                <table>
-                    <tr>
-                        <th>App</th>
-                        <th>Period</th>
-                        <th>Verdict</th>
-                        <th>Evidence</th>
-                    </tr>
-                    <tr>
-                        <td>Lalilo</td>
-                        <td>Aug 18 - Feb 3</td>
-                        <td><span class="badge badge-success">EFFECTIVE</span></td>
-                        <td>91% accuracy, 1.2 XP/Min, progressed from G1 to G2 content</td>
-                    </tr>
-                    <tr>
-                        <td>ClearFluency G2</td>
-                        <td>Jan 7 - Feb 3</td>
-                        <td><span class="badge badge-warning">MIXED</span></td>
-                        <td>79% accuracy, 0.4 XP/Min - low XP/Min suggests content may be too challenging</td>
-                    </tr>
-                    <tr>
-                        <td>Amplify</td>
-                        <td>Sep 9 - Dec 10</td>
-                        <td><span class="badge badge-success">EFFECTIVE</span></td>
-                        <td>85% accuracy, 1.2 XP/Min, phased out appropriately</td>
-                    </tr>
-                    <tr>
-                        <td>ANTON</td>
-                        <td>Oct 13 - Dec 10</td>
-                        <td><span class="badge badge-danger">INEFFECTIVE</span></td>
-                        <td>56% of time on K-level skill-shopping, phased out</td>
-                    </tr>
-                </table>
             </div>
 
         </div>
